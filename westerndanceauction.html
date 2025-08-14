@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Live Auction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+       
+body {
+    background: linear-gradient(135deg, #0a192f, #112240);
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.auction-container {
+    max-width: 1200px;
+    
+    margin: 15px auto 3px auto;
+    padding: 20px auto 3px auto;
+}
+.auction-header {
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 10px;
+    background: linear-gradient(45deg, #2468ff, #00ff88);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    animation: float 3s ease-in-out infinite;
+}
+
+
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+}
+
+.current-bid {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #00ff88;
+    text-shadow: 0 0 10px #00ff88;
+    margin: 20px 0;
+}
+
+.bid-form {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 15px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.bid-input {
+    width: 60%;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    margin-right: 10px;
+}
+
+.bid-button {
+    width: 35%;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, #2468ff, #00ff88);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.bid-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(36, 136, 255, 0.5);
+}
+
+.bid-history {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    margin-top: 20px;
+}
+
+.bid-item {
+    padding: 15px;
+    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.timer {
+    font-size: 2rem;
+    color: #ff6b6b;
+    text-align: center;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.player-section {
+    text-align: center;
+    margin: 0 0;
+
+    padding: 5px;
+}
+
+.player-card {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    width: 250px;
+    transition: all 0.3s ease;
+    margin: 10px 0px;
+}
+
+.player-card:hover {
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.player-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.player-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.player-image:hover {
+    transform: scale(1.03);
+}
+
+.player-info {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.player-title {
+    color: #00ff88;
+    font-size: 1.2rem;
+    margin-bottom: 3px;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+}
+
+#player-position {
+    color: #ffffff;
+    font-size: 0.9rem;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.player-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+.player-image-wrapper img {
+    transition: transform 0.3s ease;
+}
+
+.player-image-wrapper:hover img {
+    transform: scale(1.05);
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes slideOutLeft {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-100%); opacity: 0; }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+    </style>
+</head>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000,
+    once: true
+  });
+</script>
+
+<body>
+    <div class="auction-container">
+
+        <!-- Auction Header -->
+        <div class="auction-header" style="padding: 5px; margin-bottom: 2px;">
+            <h1 class="mb-2" style="font-size: 1.5rem;">Live Auction </h1>
+            <div class="timer" id="auction-timer" style="font-size: 1.2rem; margin: 5px 0;">
+                Time Remaining: 05:00
+            </div>
+            <div class="current-bid" style="font-size: 1.8rem; margin: 5px 0;">
+                $<span id="current-bid">0.00</span>
+            </div>
+        </div>
+
+        <!-- Player Card -->
+        <div class="d-flex justify-content-center">
+            <div class="player-card" style="margin: 10px auto 5px auto; text-align: center; max-width: 300px; ">
+            <div class="player-image-wrapper" style="height: 200px;">
+                <img id="player-image" class="player-image" src="assets/images/default-player.jpg" alt="Player Photo" style="height: 100%; width: 100%; object-fit: cover;">
+            </div>
+            <div class="player-info" style="margin-top: 10px;">
+                <div class="player-title" id="player-title" style="font-size: 1.2rem;">Select a Player</div>
+                <div id="player-position" style="font-size: 1rem; color: #ccc;">-</div>
+            </div>
+            <div style="margin-top: 5px;">
+                <button class="btn btn-success" onclick="markAsSold()">Sold</button>
+                <button class="btn btn-danger" onclick="markAsUnsold()">Unsold</button>
+            </div>
+            </div>
+        </div>
+        
+    
+</div>
+
+        <!-- Bid Form -->
+        <div class="bid-form">
+            <div class="input-group">
+                <input type="number" id="bid-amount" class="bid-input" placeholder="Enter your bid">
+                <button onclick="placeBid()" class="bid-button">
+                    <i class="fas fa-gavel"></i> Place Bid
+                </button>
+            </div>
+        </div>
+
+        <!-- Player Selection -->
+        <div class="row" id="player-selection">
+            <div class="col-md-3 mb-3">
+                <div class="player-card" onclick="selectPlayer('player1.jpeg', 'Player 1', 'Raider')">
+                    <div class="player-image-wrapper">
+                        <img src="assets/images/player1.jpeg" class="player-image" alt="Player 1">
+                    </div>
+                    <div class="player-info">
+                        <h4>Zoe</h4>
+                        <p>Raider</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="player-card" onclick="selectPlayer('diya.jpg', 'Player 2', 'Defender')">
+                    <div class="player-image-wrapper">
+                        <img src="assets/images/diya.jpg" class="player-image" alt="Player 2">
+                    </div>
+                    <div class="player-info">
+                        <h4>Diya</h4>
+                        <p>Defender</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="player-card" onclick="selectPlayer('player3.jpg', 'Player 3', 'All-Rounder')">
+                    <div class="player-image-wrapper">
+                        <img src="assets/images/player3.jpg" class="player-image" alt="Player 3">
+                    </div>
+                    <div class="player-info">
+                        <h4>Alex</h4>
+                        <p>All-Rounder</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="player-card" onclick="selectPlayer('player4.jpg', 'Player 4', 'Raider')">
+                    <div class="player-image-wrapper">
+                        <img src="assets/images/player4.jpg" class="player-image" alt="Player 4">
+                    </div>
+                    <div class="player-info">
+                        <h4>Sam</h4>
+                        <p>Raider</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Add more player cards here -->
+        </div>
+
+        <script>
+            let currentBid = 0;
+            let timer = 1200; // 20 minutes in seconds
+            let currentPlayerIndex = 0;
+            let soldPlayers = new Set(); // Track sold players
+            let timerInterval; // Store timer interval reference
+
+            // Generate 100 players
+            const positions = ['Raider', 'Defender', 'All-Rounder'];
+            const firstNames = ['Aarav', 'Aditya', 'Aisha', 'Akash', 'Amara', 'Ananya', 'Arjun', 'Arnav', 'Aryan', 'Asha',
+                              'Bharat', 'Chandra', 'Dhara', 'Esha', 'Firoz', 'Gita', 'Hari', 'Indra', 'Jaya', 'Kiran',
+                              'Lakshmi', 'Maya', 'Nisha', 'Om', 'Priya', 'Rahul', 'Sara', 'Tara', 'Uma', 'Vijay'];
+            const lastNames = ['Kumar', 'Sharma', 'Patel', 'Singh', 'Verma', 'Gupta', 'Reddy', 'Mishra', 'Iyer', 'Nair',
+                             'Menon', 'Pillai', 'Krishnan', 'Nambiar', 'Prabhu', 'Rao', 'Sastry', 'Venkatesh', 'Yadav', 'Zachariah'];
+
+            // Create the players array
+            const players = Array.from({length: 100}, (_, i) => {
+                const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                const position = positions[Math.floor(Math.random() * positions.length)];
+                const playerImage = `player${(i % 4) + 1}.jpeg`;
+                
+                return {
+                    image: playerImage,
+                    name: `${firstName} ${lastName}`,
+                    position: position
+                };
+            });
+
+            // Generate player cards
+            const playerSelection = document.getElementById('player-selection');
+            for (let i = 5; i <= 100; i++) {
+                const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                const position = positions[Math.floor(Math.random() * positions.length)];
+                const playerImage = `player${(i % 4) + 1}.jpeg`;
+
+                const playerCard = `
+                    <div class="col-md-3 mb-3">
+                        <div class="player-card" onclick="selectPlayer('${playerImage}', 'Player ${i}', '${position}')">
+                            <div class="player-image-wrapper">
+                                <img src="${playerImage}" class="player-image" alt="Player ${i}">
+                            </div>
+                            <div class="player-info">
+                                <h4>${firstName} ${lastName}</h4>
+                                <p>${position}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                playerSelection.innerHTML += playerCard;
+            }
+        </script>
+
+        <!-- Bid History -->
+        <div class="bid-history">
+            <h3>Bid History</h3>
+            <div id="bid-list"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function placeBid() {
+            const bidAmount = parseFloat(document.getElementById('bid-amount').value);
+            const currentPlayer = players[currentPlayerIndex];
+            
+            // Check if current player is sold
+            if (soldPlayers.has(currentPlayer.name)) {
+                alert('This player has already been sold!');
+                return;
+            }
+            
+            if (bidAmount > currentBid) {
+                currentBid = bidAmount;
+                updateDisplay();
+                addBidToHistory(bidAmount);
+                document.getElementById('bid-amount').value = '';
+                
+                // Show confirmation modal
+                $('#bidConfirmationModal').modal('show');
+            } else {
+                alert('Please enter a higher bid!');
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('current-bid').textContent = currentBid.toFixed(2);
+        }
+
+        function addBidToHistory(bidAmount) {
+            const bidHistory = document.getElementById('bid-list');
+            const time = new Date().toLocaleTimeString();
+            bidHistory.innerHTML = `
+                <div class="bid-item">
+                    $${bidAmount.toFixed(2)} - ${time}
+                </div>
+                ` + bidHistory.innerHTML;
+        }
+
+        function resetTimer() {
+            // Clear existing timer if any
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // Reset timer to 20 minutes
+            timer = 1200;
+            
+            // Update display immediately
+            updateTimerDisplay();
+            
+            // Start new timer
+            timerInterval = setInterval(() => {
+                timer--;
+                updateTimerDisplay();
+                
+                if (timer === 0) {
+                    clearInterval(timerInterval);
+                    alert('Time\'s up for this player!');
+                    markAsUnsold(); // Automatically move to next player when time runs out
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+            document.getElementById('auction-timer').textContent = 
+                `Time Remaining: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function showBidConfirmation() {
+            const modal = `
+                <div class="modal fade" id="bidConfirmationModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Bid Confirmation</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Your bid has been successfully placed!</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.innerHTML += modal;
+        }
+
+        function selectPlayer(playerImage, playerName, playerPosition) {
+            document.getElementById('player-image').src = playerImage;
+            document.getElementById('player-title').textContent = playerName;
+            document.getElementById('player-position').textContent = playerPosition;
+            resetTimer(); // Reset timer when selecting a new player
+        }
+
+        function markAsSold() {
+            const currentPlayer = players[currentPlayerIndex];
+            
+            // Mark current player as sold
+            soldPlayers.add(currentPlayer.name);
+            
+            // Add animation for sold player (slide right)
+            const playerCard = document.querySelector('.player-card');
+            playerCard.style.animation = 'slideOutRight 0.5s ease-out';
+            
+            // Remove current player from the list
+            players.splice(currentPlayerIndex, 1);
+            
+            // If there are more players, show the next one
+            if (players.length > 0) {
+                setTimeout(() => {
+                    // Reset bid for new player
+                    currentBid = 0;
+                    updateDisplay();
+                    
+                    // Clear bid history
+                    document.getElementById('bid-list').innerHTML = '';
+                    
+                    // Update player display
+                    const nextPlayer = players[currentPlayerIndex];
+                    document.getElementById('player-image').src = nextPlayer.image;
+                    document.getElementById('player-title').textContent = nextPlayer.name;
+                    document.getElementById('player-position').textContent = nextPlayer.position;
+                    
+                    // Reset timer for new player
+                    resetTimer();
+                    
+                    // Add animation for new player
+                    playerCard.style.animation = 'slideIn 0.5s ease-out';
+                }, 500);
+            } else {
+                // No more players
+                setTimeout(() => {
+                    clearInterval(timerInterval); // Clear timer when auction ends
+                    alert('All players have been sold!');
+                    document.getElementById('player-image').src = 'default-player.jpg';
+                    document.getElementById('player-title').textContent = 'Auction Complete';
+                    document.getElementById('player-position').textContent = 'All players sold';
+                }, 500);
+            }
+        }
+
+        function markAsUnsold() {
+            const currentPlayer = players[currentPlayerIndex];
+            
+            // Add animation for unsold player (slide left)
+            const playerCard = document.querySelector('.player-card');
+            playerCard.style.animation = 'slideOutLeft 0.5s ease-out';
+            
+            // Move to next player without removing current one
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            
+            setTimeout(() => {
+                // Reset bid for new player
+                currentBid = 0;
+                updateDisplay();
+                
+                // Clear bid history
+                document.getElementById('bid-list').innerHTML = '';
+                
+                // Update player display
+                const nextPlayer = players[currentPlayerIndex];
+                document.getElementById('player-image').src = nextPlayer.image;
+                document.getElementById('player-title').textContent = nextPlayer.name;
+                document.getElementById('player-position').textContent = nextPlayer.position;
+                
+                // Reset timer for new player
+                resetTimer();
+                
+                // Add animation for new player
+                playerCard.style.animation = 'slideIn 0.5s ease-out';
+            }, 500);
+        }
+
+        // Initialize
+        window.onload = () => {
+            showBidConfirmation();
+            resetTimer(); // Start timer when page loads
+        };
+    </script>
+
+    </script>
+</body>
+</html>

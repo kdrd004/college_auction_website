@@ -1,0 +1,33 @@
+{
+  "name": "college-auction-fest",
+  "version": "1.0.0",
+  "description": "A comprehensive web-based auction management system for college events",
+  "author": "College Auction Team",
+  "license": "MIT",
+  "keywords": [
+    "auction",
+    "college",
+    "events",
+    "bidding",
+    "management"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/college-auction-fest.git"
+  },
+  "dependencies": {
+    "Flask": "2.3.3",
+    "Flask-CORS": "4.0.0",
+    "pandas": "2.1.1",
+    "openpyxl": "3.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "python server.py",
+    "start-http": "python host.py",
+    "install": "pip install -r requirements.txt"
+  },
+  "engines": {
+    "python": ">=3.7"
+  }
+}

@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+       
+body {
+    background: linear-gradient(135deg, #0a192f, #112240);
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.auction-container {
+    max-width: 1200px;
+    margin: 10px auto 3px auto;
+    padding: 10px auto 3px auto;
+}
+
+.auction-header {
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 8px;
+    background: linear-gradient(45deg, #2468ff, #00ff88);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    animation: float 3s ease-in-out infinite;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.auction-header h1 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    flex: 0 0 auto;
+    min-width: 100px;
+}
+
+.timer {
+    font-size: 1.5rem;
+    color: #ffffff;
+    text-align: center;
+    margin: 0;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    flex: 0 0 auto;
+    min-width: 200px;
+    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    padding: 5px 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+}
+
+.current-bid {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    padding: 12px 20px;
+    border-radius: 12px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(42, 82, 152, 0.4);
+    backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+    flex: 0 0 auto;
+    min-width: 180px;
+    position: relative;
+    overflow: hidden;
+}
+
+.current-bid::before {
+    content: 'Current Bid';
+    font-size: 1rem;
+    color: #ffffff;
+    margin-right: 8px;
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    opacity: 0.95;
+    letter-spacing: 0.5px;
+}
+
+.current-bid span {
+    font-size: 2.4rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #ffffff, #ecf0f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: pulse 2s infinite;
+    letter-spacing: 1px;
+    font-family: 'Arial', sans-serif;
+    position: relative;
+    padding: 0 5px;
+}
+
+.current-bid::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.current-bid:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(42, 82, 152, 0.5);
+    background: linear-gradient(135deg, #2a5298, #1e3c72);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.current-bid:hover::after {
+    transform: translateX(100%);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.bid-form {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.bid-input {
+    width: 60%;
+    padding: 8px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.9);
+    margin-right: 8px;
+}
+
+.bid-button {
+    width: 35%;
+    padding: 8px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(45deg, #2468ff, #00ff88);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.bid-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(36, 136, 255, 0.5);
+}
+
+.bid-history {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    margin-top: 20px;
+}
+
+.bid-history h3 {
+    color: #ffffff;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.bid-item {
+    padding: 15px;
+    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    animation: slideIn 0.5s ease-out;
+    color: #000000;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.bid-item:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateX(5px);
+    transition: all 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.player-section {
+    text-align: center;
+    margin: 15px 0;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    transition: all 0.5s ease;
+}
+
+.player-section.slide-right {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.player-section.slide-left {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.main-player-card {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.participants-section {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    text-align: left;
+}
+
+.participants-section h3 {
+    color: #00ff88;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.participants-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+}
+
+.participants-section li {
+    color: #ffffff;
+    margin: 2px 0;
+    padding: 5px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.participants-section li:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(3px);
+}
+
+.player-card {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    width: 280px;
+    transition: all 0.3s ease;
+    margin: 10px;
+    position: relative;
+    flex: 1 1 280px;
+    max-width: 300px;
+}
+
+.player-card:hover {
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.player-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.player-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.player-image:hover {
+    transform: scale(1.03);
+}
+
+.player-info {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.player-title {
+    color: #00ff88;
+    font-size: 1.2rem;
+    margin-bottom: 3px;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+}
+
+#player-position {
+    color: #ffffff;
+    font-size: 0.9rem;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.player-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+.player-image-wrapper img {
+    transition: transform 0.3s ease;
+}
+
+.player-image-wrapper:hover img {
+    transform: scale(1.05);
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes slideOutLeft {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-100%); opacity: 0; }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 15px;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.sold-symbol {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 48px;
+    color: #2ecc71;
+    text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+    z-index: 2;
+    animation: soldSymbolPop 0.5s ease-out forwards;
+}
+
+@keyframes soldSymbolPop {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.status-available {
+    background: linear-gradient(135deg, #2468ff, #00ff88);
+}
+
+.status-sold {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.status-unsold {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.participants-list {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 5px;
+    backdrop-filter: blur(5px);
+    text-align: left;
+}
+
+.participants-list h5 {
+    color: #00ff88;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.participants-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
+}
+
+.participants-list li {
+    color: #ffffff;
+    margin: 2px 0;
+    padding: 3px 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#player-selection {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+#player-selection .col-md-6 {
+    flex: 1 1 300px;
+    max-width: 300px;
+    margin: 0;
+    padding: 0;
+}
+
+#player-selection .player-card {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#player-selection .player-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#player-selection .participants-list {
+    margin-top: auto;
+}
+
+.group-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 20px;
+}
+
+.group-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    backdrop-filter: blur(5px);
+}
+
+.group-card:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.group-card.selected {
+    background: linear-gradient(45deg, #2468ff, #00ff88);
+    border-color: #ffffff;
+    transform: scale(1.05);
+}
+
+.group-logo {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.group-name {
+    font-size: 1.1rem;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+#groupSelectionModal .modal-content {
+    background: linear-gradient(135deg, #0a192f, #112240);
+    border: none;
+    border-radius: 15px;
+}
+
+#groupSelectionModal .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#groupSelectionModal .modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#groupSelectionModal .modal-title {
+    color: #ffffff;
+}
+
+#groupSelectionModal .btn-close {
+    filter: invert(1);
+}
+
+.group-selection {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 15px;
+}
+
+.group-option {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.group-option:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.group-option.selected {
+    background: linear-gradient(45deg, #2468ff, #00ff88);
+    border-color: #ffffff;
+    transform: scale(1.05);
+}
+
+.group-option img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px;
+}
+
+.group-option span {
+    font-size: 1rem;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+@media (max-width: 992px) {
+    .group-selection {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .group-selection {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .group-selection {
+        grid-template-columns: 1fr;
+    }
+}
+
+    </style>
+</head>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000,
+    once: true
+  });
+</script>
+
+<body>
+    <div class="auction-container">
+        
+        <!-- Auction Header -->
+        <div class="auction-header">
+            <h1>Live Auction</h1>
+            <div class="current-bid">
+                <span id="current-bid">0.00</span>
+            </div>
+            <div class="timer" id="auction-timer">
+                Time Remaining: 05:00
+            </div>
+        </div>
+
+        <!-- Player Card -->
+        <div class="player-section">
+            <div class="main-player-card">
+                <div class="player-card" style="margin: 10px auto 5px auto; text-align: center;">
+                    <div class="player-image-wrapper" style="height: 200px;">
+                        <img id="player-image" class="player-image" src="" alt="Player Photo" style="height: 100%; width: 100%; object-fit: cover;">
+                    </div>
+                    <div class="player-info" style="margin-top: 10px;">
+                        <div class="player-title" id="player-title" style="font-size: 1.2rem;">Select a Player</div>
+                        <div id="player-position" style="font-size: 1rem; color: #ccc;">-</div>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        <button class="btn btn-success" onclick="markAsSold()">Sold</button>
+                        <button class="btn btn-danger" onclick="markAsUnsold()">Unsold</button>
+                    </div>
+                </div>
+            </div>
+            <div class="participants-section">
+                <h3>Team Members</h3>
+                <div id="participants-list">
+                    <ul>
+                        <li>Select a team to view members</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+    
+</div>
+
+        <!-- Bid Form -->
+        <div class="bid-form">
+            <div class="input-group">
+                <input type="number" id="bid-amount" class="bid-input" placeholder="Enter your bid" onkeydown="if(event.key === 'Enter') { event.preventDefault(); placeBid(); }">
+                <button onclick="placeBid()" class="bid-button">
+                    <i class="fas fa-gavel"></i> Place Bid
+                </button>
+            </div>
+        </div>
+
+        <!-- Player Selection -->
+        <div id="player-selection">
+            <div class="player-card" onclick="selectPlayer('Navagraha.jpg', 'NAVAGRAHA', 'Western Singing')">
+                <div class="status-badge status-available">Available</div>
+                <div class="player-image-wrapper">
+                    <img src="assets/images/Navagraha.jpg" class="player-image" alt="NAVAGRAHA">
+                </div>
+                <div class="player-info">
+                    <h4>NAVAGRAHA</h4>
+                    <p>Team Size: 13 Members</p>
+                    <div class="participants-list">
+                        <h5>Team Members:</h5>
+                        <ul>
+                            <li>Ranjan HB</li>
+                            <li>Yashwanth</li>
+                            <li>RajKishore</li>
+                            <li>Nishanth</li>
+                            <li>Darshan LA</li>
+                            <li>Lokesh KS</li>
+                            <li>Shashank AR</li>
+                            <li>Hemanth</li>
+                            <li>Chandan V</li>
+                            <li>Karthik</li>
+                            <li>Monish Chandra</li>
+                            <li>Likith GB</li>
+                            <li>Prajwal V</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="player-card" onclick="selectPlayer('RT.jpg', 'Raaga Taranga', 'Western Singing')">
+                <div class="status-badge status-available">Available</div>
+                <div class="player-image-wrapper">
+                    <img src="assets/images/RT.jpg" class="player-image" alt="Raaga Taranga">
+                </div>
+                <div class="player-info">
+                    <h4>Raaga Taranga</h4>
+                    <p>Team Size: 9 Members</p>
+                    <div class="participants-list">
+                        <h5>Team Members:</h5>
+                        <ul>
+                            <li>Poorvi C G</li>
+                            <li>Kavya</li>
+                            <li>Lekhana V</li>
+                            <li>Chandana K N</li>
+                            <li>Srinidhi H S</li>
+                            <li>Sushmitha N</li>
+                            <li>Thejaswini M</li>
+                            <li>Jenisha N</li>
+                            <li>Anam Firdose</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="player-card" onclick="selectPlayer('TheResonance.jpeg', 'The Resonance', 'Western Singing')">
+                <div class="status-badge status-available">Available</div>
+                <div class="player-image-wrapper">
+                    <img src="assets/images/TheResonance.jpeg" class="player-image" alt="The Resonance">
+                </div>
+                <div class="player-info">
+                    <h4>The Resonance</h4>
+                    <p>Team Size: 12 Members</p>
+                    <div class="participants-list">
+                        <h5>Team Members:</h5>
+                        <ul>
+                            <li>Syeda Inshiraah</li>
+                            <li>Mohammadi Khanum</li>
+                            <li>Noorain Fathima</li>
+                            <li>xyz</li>
+                            <li>xyz</li>
+                            <li>xyz</li>
+                            <li>xyz</li>
+                            <li>xyz</li>
+                            <li>xyz</li>
+                            <li>xyz</li>
+                            <li>xyz</li>
+                            <li>xyz</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="player-card" onclick="selectPlayer('Aish.jpeg', 'Rickshawtea', 'CSE')">
+                <div class="status-badge status-available">Available</div>
+                <div class="player-image-wrapper">
+                    <img src="assets/images/Aish.jpeg" class="player-image" alt="Rickshawtea">
+                </div>
+                <div class="player-info">
+                    <h4>Rickshawtea</h4>
+                    <p>Team size : 7 Members</p>
+                    <div class="participants-list">
+                        <h5>Team Members:</h5>
+                        <ul>
+                            <li>Vishwavidatha</li>
+                            <li>Aishwarya</li>
+                            <li>Tejas</li>
+                            <li>Nikil</li>
+                            <li>Suhas</li>
+                            <li>Siri</li>
+                            <li>Souraba</li>
+                            <li>Thanushree</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="player-card" onclick="selectPlayer('Civamads.jpg', 'Civa Mads', 'Singing')">
+                <div class="status-badge status-available">Available</div>
+                <div class="player-image-wrapper">
+                    <img src="assets/images/Civamads.jpg" class="player-image" alt="Civa Mads">
+                </div>
+                <div class="player-info">
+                    <h4>Civa Mads</h4>
+                    <p>Team size : 10 Members</p>
+                    <div class="participants-list">
+                        <h5>Team Members:</h5>
+                        <ul>
+                            <li>Varshapriya</li>
+                            <li>Himani. R</li>
+                            <li>Thashwin. D</li>
+                            <li>Akila. P</li>
+                            <li>Jaagu Kumari</li>
+                            <li>Pallavi. G</li>
+                            <li>Rachita. R</li>
+                            <li>Sonu. K K</li>
+                            <li>Tejashwin Y S</li>
+                            <li>Kaveri N</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="player-card" onclick="selectPlayer('AURORAVOX.jpg', 'Aurora VOX', 'Western Singing')">
+                <div class="status-badge status-available">Available</div>
+                <div class="player-image-wrapper">
+                    <img src="assets/images/AURORAVOX.jpg" class="player-image" alt="Aurora VOX">
+                </div>
+                <div class="player-info">
+                    <h4>Aurora VOX</h4>
+                    <p>Team Size: 7 Members</p>
+                    <div class="participants-list">
+                       
+                        <ul>
+                            <li>V JAHNAVI</li>
+                            <li>Keerthana T G</li>
+                            <li>Varsha Kashyap M R</li>
+                            <li>Yuktha</li>
+                            <li>Neha G</li>
+                            <li>Supriya</li>
+                            <li>Preksha</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            
+        </div>
+
+        <script>
+            let currentBid = 0;
+            let timer = 300; // 5 minutes in seconds
+            let currentPlayerIndex = 0;
+            let soldPlayers = new Set(); // Track sold players
+            let timerInterval; // Store timer interval reference
+            let players = [];
+
+            // Initialize players array with the new teams
+            players = [
+                { 
+                    image: 'Navagraha.jpg', 
+                    name: 'NAVAGRAHA', 
+                    position: 'Western Singing',
+                    participants: [
+                        'Ranjan HB',
+                        'Yashwanth',
+                        'RajKishore',
+                        'Nishanth',
+                        'Darshan LA',
+                        'Lokesh KS',
+                        'Shashank AR',
+                        'Hemanth',
+                        'Chandan V',
+                        'Karthik',
+                        'Monish Chandra',
+                        'Likith GB',
+                        'Prajwal V'
+                    ],
+                    element: document.querySelector('.player-card[onclick*="Navagraha.jpg"]')
+                },
+
+                { 
+                    image: 'RT.jpg', 
+                    name: 'Raaga Taranga', 
+                    position: 'Western Singing',
+                    participants: [
+                        'Poorvi C G',
+                        'Kavya',
+                        'Lekhana V',
+                        'Chandana K N',
+                        'Srinidhi H S',
+                        'Sushmitha N',
+                        'Thejaswini M',
+                        'Jenisha N',
+                        'Anam Firdose'
+                    ],
+                    element: document.querySelector('.player-card[onclick*="RT.jpg"]')
+                },
+                
+
+                
+                { 
+                    image: 'TheResonance.jpeg', 
+                    name: 'The Resonance', 
+                    position: 'Western Singing',
+                    participants: [
+                        'Syeda Inshiraah',
+                        'Mohammadi Khanum',
+                        'Noorain Fathima',
+                        'xyz',
+                        'xyz',
+                        'xyz',
+                        'xyz',
+                        'xyz',
+                        'xyz',
+                        'xyz',
+                        'xyz',
+                        'xyz'
+                    ],
+                    element: document.querySelector('.player-card[onclick*="The Resonance.jpeg"]')
+                },
+                { 
+                    image: 'Aish.jpeg', 
+                    name: 'Rickshawtea', 
+                    position: '',
+                    participants: [
+                        'Vishwavidatha',
+                        'Aishwarya',
+                        'Tejas',
+                        'Nikil',
+                        'Suhas',
+                        'Siri',
+                        'Souraba',
+                        'Thanushree'
+                    ],
+                    element: document.querySelector('.player-card[onclick*="Aish.jpeg"]')
+                },
+                { 
+    image: 'Civamads.jpg', 
+    name: 'Civa Mads', 
+    position: 'Singing',
+    participants: [
+        'Varshapriya',
+        'Himani. R',
+        'Thashwin. D',
+        'Akila. P',
+        'Jaagu Kumari',
+        'Pallavi. G',
+        'Rachita. R',
+        'Sonu. K K',
+        'Tejashwin Y S',
+        'Kaveri N'
+    ],
+    element: document.querySelector('.player-card[onclick*="Civamads.jpg"]')
+},
+                
+                { 
+    image: 'AURORAVOX.jpg', 
+    name: 'Aurora VOX', 
+    position: 'Western Singing',
+    participants: [
+        'V JAHNAVI',
+        'Keerthana T G',
+        'Varsha Kashyap M R',
+        'Yuktha',
+        'Neha G',
+        'Supriya',
+        'Preksha'
+    ],
+    element: document.querySelector('.player-card[onclick*="AURORAVOX.jpg"]')
+}
+
+                
+            ];
+
+            // Remove the old player generation code
+            // const positions = ['Raider', 'Defender', 'All-Rounder'];
+            // const firstNames = [...];
+            // const lastNames = [...];
+            // const playersArray = Array.from({length: 100}, ...);
+
+            // Initialize the display with the first team
+            window.onload = () => {
+                showBidConfirmation();
+                resetTimer();
+                
+                // Set initial player display
+                if (players.length > 0) {
+                    const firstPlayer = players[0];
+                    document.getElementById('player-image').src = firstPlayer.image;
+                    document.getElementById('player-title').textContent = firstPlayer.name;
+                    document.getElementById('player-position').textContent = firstPlayer.position;
+                    
+                    // Update participants list
+                    const participantsList = document.getElementById('participants-list');
+                    participantsList.innerHTML = `
+                        <ul>
+                            ${firstPlayer.participants.map(p => `<li>${p}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+            };
+
+            // Function to save player status to Excel
+            async function savePlayerStatus(playerName, position, status, event, bidAmount, teamName, photoAssociated, soldToGroup) {
+                try {
+                    // Get the current bid amount from the display
+                    const currentBidAmount = document.getElementById('current-bid').textContent;
+                    
+                    // Create the data object with all required information
+                    const data = {
+                        playerName: playerName,
+                        position: position,
+                        status: status,
+                        event: event,
+                        bidAmount: currentBidAmount,
+                        teamName: teamName,
+                        photoAssociated: photoAssociated,
+                        soldToGroup: soldToGroup, // This will be the selected group name
+                        timestamp: new Date().toLocaleString()
+                    };
+
+                    // Log the data being sent for debugging
+                    console.log('Saving player status with data:', data);
+                    
+                    const response = await fetch('http://localhost:5000/save-player-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await response.json();
+                    if (!result.success) {
+                        console.error('Failed to save player status:', result.message);
+                    } else {
+                        console.log('Successfully saved player status with group:', soldToGroup);
+                    }
+                } catch (error) {
+                    console.error('Error saving player status:', error);
+                }
+            }
+
+            function placeBid() {
+                const bidAmount = parseFloat(document.getElementById('bid-amount').value);
+                const currentPlayer = players[currentPlayerIndex];
+                
+                // Check if current player is sold
+                if (soldPlayers.has(currentPlayer.name)) {
+                    alert('This player has already been sold!');
+                    return;
+                }
+                
+                if (bidAmount > currentBid) {
+                    currentBid = bidAmount;
+                    updateDisplay();
+                    addBidToHistory(bidAmount);
+                    document.getElementById('bid-amount').value = '';
+                    
+                    // Show confirmation modal
+                    $('#bidConfirmationModal').modal('show');
+                } else {
+                    alert('Please enter a higher bid!');
+                }
+            }
+
+            function updateDisplay() {
+                document.getElementById('current-bid').textContent = currentBid.toFixed(2);
+            }
+
+            function addBidToHistory(bidAmount) {
+                const bidHistory = document.getElementById('bid-list');
+                const time = new Date().toLocaleTimeString();
+                bidHistory.innerHTML = `
+                    <div class="bid-item">
+                        $${bidAmount.toFixed(2)} - ${time}
+                    </div>
+                    ` + bidHistory.innerHTML;
+            }
+
+            function resetTimer() {
+                // Clear existing timer if any
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+                
+                // Reset timer to 5 minutes
+                timer = 300;
+                
+                // Update display immediately
+                updateTimerDisplay();
+                
+                // Start new timer
+                timerInterval = setInterval(() => {
+                    timer--;
+                    updateTimerDisplay();
+                    
+                    if (timer === 0) {
+                        clearInterval(timerInterval);
+                        alert('Time\'s up for this player!');
+                        markAsUnsold(); // Automatically move to next player when time runs out
+                    }
+                }, 1000);
+            }
+
+            function updateTimerDisplay() {
+                const minutes = Math.floor(timer / 60);
+                const seconds = timer % 60;
+                document.getElementById('auction-timer').textContent = 
+                    `Time Remaining: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            function showBidConfirmation() {
+                const modal = `
+                    <div class="modal fade" id="bidConfirmationModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Bid Confirmation</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Your bid has been successfully placed!</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.innerHTML += modal;
+            }
+
+            function selectPlayer(playerImage, playerName, playerPosition) {
+                document.getElementById('player-image').src = playerImage;
+                document.getElementById('player-title').textContent = playerName;
+                document.getElementById('player-position').textContent = playerPosition;
+                
+                // Find the selected player's details
+                const selectedPlayer = players.find(p => p.image === playerImage);
+                if (selectedPlayer) {
+                    // Update the participants list
+                    const participantsList = document.getElementById('participants-list');
+                    participantsList.innerHTML = `
+                        <ul>
+                            ${selectedPlayer.participants.map(p => `<li>${p}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+                
+                resetTimer();
+            }
+
+            function showGroupSelectionModal(callback) {
+                const modal = `
+                    <div class="modal fade" id="groupSelectionModal" tabindex="-1" aria-labelledby="groupSelectionModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="groupSelectionModalLabel">Select Team</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="group-selection">
+                                        <div class="group-option" onclick="selectGroup('Royal Challengers', this)">
+                                            <img src="assets/images/royal challengers logo 1 (1).jpeg" alt="Royal Challengers">
+                                            <span>Royal Challengers</span>
+                                        </div>
+                                        <div class="group-option" onclick="selectGroup('Super King', this)">
+                                            <img src="assets/images/Kings logo.jpeg" alt="Super King">
+                                            <span>Super King</span>
+                                        </div>
+                                        <div class="group-option" onclick="selectGroup('Wadyers Warriors', this)">
+                                            <img src="assets/images/Warriors logo.jpeg" alt="Wadyers Warriors">
+                                            <span>Wadyers Warriors</span>
+                                        </div>
+                                        <div class="group-option" onclick="selectGroup('Sea Lions', this)">
+                                            <img src="assets/images/sea lions logo (1).jpeg" alt="Sea Lions">
+                                            <span>Sea Lions</span>
+                                        </div>
+                                        <div class="group-option" onclick="selectGroup('Gladiators', this)">
+                                            <img src="assets/images/gladiators logo.jpeg" alt="Gladiators">
+                                            <span>Gladiators</span>
+                                        </div>
+                                        <div class="group-option" onclick="selectGroup('Red bulls', this)">
+                                            <img src="assets/images/Bull logo.jpeg" alt="Red bulls">
+                                            <span>Red bulls</span>
+                                        </div>
+                                        <div class="group-option" onclick="selectGroup('Dare Dragons', this)">
+                                            <img src="assets/images/dragons logo (1).jpeg" alt="Dare Dragons">
+                                            <span>Dare Dragons</span>
+                                        </div>
+                                        <div class="group-option" onclick="selectGroup('Panthers', this)">
+                                            <img src="assets/images/Panthers logo.jpeg" alt="Panthers">
+                                            <span>Panthers</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" onclick="cancelGroupSelection()">Cancel</button>
+                                    <button type="button" class="btn btn-primary" onclick="confirmGroupSelection()">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.innerHTML += modal;
+                const modalElement = new bootstrap.Modal(document.getElementById('groupSelectionModal'));
+                modalElement.show();
+                
+                // Store the callback function
+                window.confirmGroupSelection = () => {
+                    const selectedCard = document.querySelector('.group-option.selected');
+                    if (!selectedCard) {
+                        alert('Please select a team!');
+                        return;
+                    }
+                    const selectedGroup = selectedCard.querySelector('span').textContent;
+                    modalElement.hide();
+                    callback(selectedGroup);
+                    document.getElementById('groupSelectionModal').remove();
+                };
+
+                window.cancelGroupSelection = () => {
+                    modalElement.hide();
+                    document.getElementById('groupSelectionModal').remove();
+                };
+            }
+
+            function selectGroup(groupName, element) {
+                // Remove selection from all cards
+                document.querySelectorAll('.group-option').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                // Add selection to clicked card
+                element.classList.add('selected');
+            }
+
+            function updateTeamWallet(teamName, bidAmount) {
+                // Get current wallet values from localStorage or initialize with 50000
+                let wallets = JSON.parse(localStorage.getItem('teamWallets')) || {
+                    'Royal Challengers': 50000,
+                    'Super King': 50000,
+                    'Wadyers Warriors': 50000,
+                    'Sea Lions': 50000,
+                    'Gladiators': 50000,
+                    'Red bulls': 50000,
+                    'Dare Dragons': 50000,
+                    'Panthers': 50000
+                };
+
+                // Update the wallet for the specific team
+                if (wallets[teamName] !== undefined) {
+                    // Check if the team has enough money
+                    if (wallets[teamName] >= bidAmount) {
+                        wallets[teamName] -= bidAmount;
+                        localStorage.setItem('teamWallets', JSON.stringify(wallets));
+                        
+                        // Trigger a storage event to update other pages
+                        const event = new StorageEvent('storage', {
+                            key: 'teamWallets',
+                            newValue: JSON.stringify(wallets)
+                        });
+                        window.dispatchEvent(event);
+                        
+                        // Show success message
+                        alert(`Successfully deducted ₹${bidAmount} from ${teamName}'s wallet. Remaining balance: ₹${wallets[teamName]}`);
+                        return true;
+                    } else {
+                        alert(`Insufficient funds! ${teamName} has only ₹${wallets[teamName]} available.`);
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function markAsSold() {
+                const currentPlayer = players[currentPlayerIndex];
+                if (currentPlayer) {
+                    // Show group selection modal first
+                    showGroupSelectionModal((selectedGroup) => {
+                        // Get current wallet values
+                        let wallets = JSON.parse(localStorage.getItem('teamWallets')) || {
+                            'Royal Challengers': 50000,
+                            'Super King': 50000,
+                            'Wadyers Warriors': 50000,
+                            'Sea Lions': 50000,
+                            'Gladiators': 50000,
+                            'Red bulls': 50000,
+                            'Dare Dragons': 50000,
+                            'Panthers': 50000
+                        };
+
+                        // Check if the team has enough money
+                        if (wallets[selectedGroup] >= currentBid) {
+                            // If they have enough money, proceed with the current bid
+                            if (updateTeamWallet(selectedGroup, currentBid)) {
+                                completeSale(currentPlayer, selectedGroup, currentBid);
+                            }
+                        } else {
+                            // If they don't have enough money, ask if they want to sell at their available amount
+                            const availableAmount = wallets[selectedGroup];
+                            if (confirm(`${selectedGroup} has only ₹${availableAmount} available. Would you like to sell at this amount?`)) {
+                                // Update the current bid to their available amount
+                                currentBid = availableAmount;
+                                updateDisplay();
+                                
+                                // Update the wallet with their available amount
+                                if (updateTeamWallet(selectedGroup, availableAmount)) {
+                                    completeSale(currentPlayer, selectedGroup, availableAmount);
+                                }
+                            } else {
+                                // If they don't want to sell at the available amount, cancel the sale
+                                alert('Sale cancelled. Please select another team or mark as unsold.');
+                            }
+                        }
+                    });
+                }
+            }
+
+            function completeSale(currentPlayer, selectedGroup, bidAmount) {
+                // Update the status badge in the player selection section
+                const playerCard = document.querySelector(`.player-card[onclick*="${currentPlayer.image}"]`);
+                if (playerCard) {
+                    const statusBadge = playerCard.querySelector('.status-badge');
+                    statusBadge.className = 'status-badge status-sold';
+                    statusBadge.textContent = 'Sold';
+                    
+                    // Add sold symbol
+                    const soldSymbol = document.createElement('div');
+                    soldSymbol.className = 'sold-symbol';
+                    soldSymbol.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    playerCard.appendChild(soldSymbol);
+                }
+                
+                // Animate the entire player section
+                const playerSection = document.querySelector('.player-section');
+                playerSection.classList.add('slide-right');
+                
+                // Save to Excel with all required information including bid amount and group
+                savePlayerStatus(
+                    currentPlayer.name,
+                    currentPlayer.position,
+                    'Sold',
+                    'Western Singing',
+                    bidAmount,
+                    document.getElementById('player-title').textContent,
+                    document.getElementById('player-image').src,
+                    selectedGroup
+                );
+                
+                // Move to next player after animation
+                setTimeout(() => {
+                    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                    
+                    // Reset bid for new player
+                    currentBid = 0;
+                    updateDisplay();
+                    
+                    // Clear bid history
+                    document.getElementById('bid-list').innerHTML = '';
+                    
+                    // Update player display with next player
+                    const nextPlayer = players[currentPlayerIndex];
+                    document.getElementById('player-image').src = nextPlayer.image;
+                    document.getElementById('player-title').textContent = nextPlayer.name;
+                    document.getElementById('player-position').textContent = nextPlayer.position;
+                    
+                    // Update participants list
+                    const participantsList = document.getElementById('participants-list');
+                    if (nextPlayer.participants) {
+                        participantsList.innerHTML = `
+                            <ul>
+                                ${nextPlayer.participants.map(p => `<li>${p}</li>`).join('')}
+                            </ul>
+                        `;
+                    } else {
+                        participantsList.innerHTML = `
+                            <ul>
+                                <li>No team members available</li>
+                            </ul>
+                        `;
+                    }
+                    
+                    // Reset timer for new player
+                    resetTimer();
+                    
+                    // Reset player section animation
+                    playerSection.classList.remove('slide-right');
+                    
+                    // Hide the sold player card
+                    if (currentPlayer.element) {
+                        currentPlayer.element.style.display = 'none';
+                    }
+                }, 500);
+            }
+
+            function markAsUnsold() {
+                const currentPlayer = players[currentPlayerIndex];
+                if (currentPlayer) {
+                    // Update the status badge in the player selection section
+                    const playerCard = document.querySelector(`.player-card[onclick*="${currentPlayer.image}"]`);
+                    if (playerCard) {
+                        const statusBadge = playerCard.querySelector('.status-badge');
+                        statusBadge.className = 'status-badge status-unsold';
+                        statusBadge.textContent = 'Unsold';
+                    }
+                    
+                    // Animate the entire player section
+                    const playerSection = document.querySelector('.player-section');
+                    playerSection.classList.add('slide-left');
+                    
+                    // Save to Excel with all required information including bid amount
+                    savePlayerStatus(
+                        currentPlayer.name,
+                        currentPlayer.position,
+                        'Unsold',
+                        'Western Singing',
+                        currentBid,
+                        document.getElementById('player-title').textContent,
+                        document.getElementById('player-image').src,
+                        null
+                    );
+                    
+                    // Move to next player after animation
+                    setTimeout(() => {
+                        currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                        
+                        // Reset bid for new player
+                        currentBid = 0;
+                        updateDisplay();
+                        
+                        // Clear bid history
+                        document.getElementById('bid-list').innerHTML = '';
+                        
+                        // Update player display with next player
+                        const nextPlayer = players[currentPlayerIndex];
+                        document.getElementById('player-image').src = nextPlayer.image;
+                        document.getElementById('player-title').textContent = nextPlayer.name;
+                        document.getElementById('player-position').textContent = nextPlayer.position;
+                        
+                        // Update participants list
+                        const participantsList = document.getElementById('participants-list');
+                        if (nextPlayer.participants) {
+                            participantsList.innerHTML = `
+                                <ul>
+                                    ${nextPlayer.participants.map(p => `<li>${p}</li>`).join('')}
+                                </ul>
+                            `;
+                        } else {
+                            participantsList.innerHTML = `
+                                <ul>
+                                    <li>No team members available</li>
+                                </ul>
+                            `;
+                        }
+                        
+                        // Reset timer for new player
+                        resetTimer();
+                        
+                        // Reset player section animation
+                        playerSection.classList.remove('slide-left');
+                        
+                        // Hide the unsold player card
+                        if (currentPlayer.element) {
+                            currentPlayer.element.style.display = 'none';
+                        }
+                    }, 500);
+                }
+            }
+
+            function nextPlayer() {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                if (currentPlayerIndex < players.length) {
+                    setTimeout(() => {
+                        // Reset bid for new player
+                        currentBid = 0;
+                        updateDisplay();
+                        
+                        // Clear bid history
+                        document.getElementById('bid-list').innerHTML = '';
+                        
+                        // Update player display
+                        const nextPlayer = players[currentPlayerIndex];
+                        document.getElementById('player-image').src = nextPlayer.image;
+                        document.getElementById('player-title').textContent = nextPlayer.name;
+                        document.getElementById('player-position').textContent = nextPlayer.position;
+                        
+                        // Update participants list
+                        const participantsList = document.getElementById('participants-list');
+                        if (nextPlayer.participants) {
+                            participantsList.innerHTML = `
+                                <ul>
+                                    ${nextPlayer.participants.map(p => `<li>${p}</li>`).join('')}
+                                </ul>
+                            `;
+                        } else {
+                            participantsList.innerHTML = `
+                                <ul>
+                                    <li>No team members available</li>
+                                </ul>
+                            `;
+                        }
+                        
+                        // Reset timer for new player
+                        resetTimer();
+                        
+                        // Add animation for new player
+                        nextPlayer.element.style.animation = 'slideIn 0.5s ease-out';
+                        
+                        // Reset player section animation
+                        const playerSection = document.querySelector('.player-section');
+                        playerSection.classList.remove('slide-right', 'slide-left');
+                    }, 500);
+                } else {
+                    // No more players
+                    setTimeout(() => {
+                        clearInterval(timerInterval);
+                        alert('All players have been sold!');
+                        document.getElementById('player-image').src = 'default-player.jpg';
+                        document.getElementById('player-title').textContent = 'Auction Complete';
+                        document.getElementById('player-position').textContent = 'All players sold';
+                        document.getElementById('participants-list').innerHTML = `
+                            <ul>
+                                <li>Auction has been completed</li>
+                            </ul>
+                        `;
+                    }, 500);
+                }
+            }
+        </script>
+
+        <!-- Bid History -->
+        <div class="bid-history">
+            <h3>Bid History</h3>
+            <div id="bid-list"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
